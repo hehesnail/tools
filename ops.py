@@ -106,7 +106,7 @@ def deconv2d(x, output_shape,
             return deconv 
 
 """
-deconv23d for upsampling
+deconv3d for upsampling
 """
 def deconv3d(x, output_shape,
             k_d=4, k_h=4, k_w=4, d_d=2, d_h=2, d_w=2, stddev=0.02,
@@ -262,6 +262,3 @@ leaky relu activation function
 """
 def lrelu(x, leak=0.2, name="lrelu"):
     return tf.maximum(x, leak*x)
-
-
-    
