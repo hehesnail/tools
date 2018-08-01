@@ -15,8 +15,9 @@ def concat(tensors, axis, *args, **kwargs):
 
 """
 conv2d for downsampling
+Using He initialization
 """
-def conv2d(x, output_dim, 
+def conv2d(x, output_dim,
         k_h=4, k_w=4, d_h=2, d_w=2, stddev = 0.02,
         name="conv2d", sn=False, with_w=False, padding="SAME"):
     """
@@ -30,12 +31,12 @@ def conv2d(x, output_dim,
         x: [N, H/d_h, W/d_w, output_dim]
     """
     with tf.variable_scope(name) as scope:
-        w = tf.get_variable("w", [k_h, k_w, x.get_shape()[-1], output_dim], 
+        w = tf.get_variable("w", [k_h, k_w, x.get_shape()[-1], output_dim],
                         initializer=tf.truncated_normal_initializer(stddev=stddev))
         if sn:
             w = sepctral_norm(w)
         conv = tf.nn.conv2d(x, w, strides=[1, d_h, d_w, 1], padding=padding)
-        biases = tf.get_variable("biases", [output_dim], 
+        biases = tf.get_variable("biases", [output_dim],
                                 initializer=tf.constant_initializer(0.0))
         conv = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
 
@@ -46,8 +47,9 @@ def conv2d(x, output_dim,
 
 """
 conv3d for downsampling
+Using He initializetion
 """
-def conv3d(x, output_dim, 
+def conv3d(x, output_dim,
         k_d=4, k_h=4, k_w=4, d_d=2, d_h=2, d_w=2, stddev = 0.02,
         name="conv3d", with_w=False, padding="SAME"):
     """
@@ -60,10 +62,10 @@ def conv3d(x, output_dim,
         x: [N, D/d_d, H/d_h, W/d_w, output_dim]
     """
     with tf.variable_scope(name) as scope:
-        w = tf.get_variable("w", [k_d, k_h, k_w, x.get_shape()[-1], output_dim], 
+        w = tf.get_variable("w", [k_d, k_h, k_w, x.get_shape()[-1], output_dim],
                         initializer=tf.truncated_normal_initializer(stddev=stddev))
         conv = tf.nn.conv3d(x, w, strides=[1, d_d, d_h, d_w, 1], padding=padding)
-        biases = tf.get_variable("biases", [output_dim], 
+        biases = tf.get_variable("biases", [output_dim],
                                 initializer=tf.constant_initializer(0.0))
         conv = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
 
@@ -74,6 +76,7 @@ def conv3d(x, output_dim,
 
 """
 deconv2d for upsampling
+Using He initialization
 """
 def deconv2d(x, output_shape,
             k_h=4, k_w=4, d_h=2, d_w=2, stddev=0.02,
@@ -90,23 +93,24 @@ def deconv2d(x, output_shape,
     """
     with tf.variable_scope(name) as scope:
         #filter: [k_h, k_w, out_c, in_c]
-        w = tf.get_variable("w", [k_h, k_w, output_shape[-1], x.get_shape()[-1]], 
+        w = tf.get_variable("w", [k_h, k_w, output_shape[-1], x.get_shape()[-1]],
                             initializer=tf.truncated_normal_initializer(stddev=stddev))
         if sn:
             w = sepctral_norm(w)
-        deconv = tf.nn.conv2d_transpose(x, w, outut_shape=output_shape,
+        deconv = tf.nn.conv2d_transpose(x, w, output_shape=output_shape,
                             strides=[1,d_h,d_w,1], padding=padding)
-        biases = tf.get_variable("biases", [output_shape[-1]], 
+        biases = tf.get_variable("biases", [output_shape[-1]],
                                 initializer=tf.constant_initializer(0.0))
-        deconv = tf.reshape(tf.nn.bias_add(deconv, biases), deconv.get_shape()) 
+        deconv = tf.reshape(tf.nn.bias_add(deconv, biases), deconv.get_shape())
 
         if with_w:
             return deconv, w, biases
         else:
-            return deconv 
+            return deconv
 
 """
 deconv3d for upsampling
+Using He initialization
 """
 def deconv3d(x, output_shape,
             k_d=4, k_h=4, k_w=4, d_d=2, d_h=2, d_w=2, stddev=0.02,
@@ -122,18 +126,18 @@ def deconv3d(x, output_shape,
     """
     with tf.variable_scope(name) as scope:
         #filter: [k_d, k_h, k_w, out_c, in_c]
-        w = tf.get_variable("w", [k_d, k_h, k_w, output_shape[-1], x.get_shape()[-1]], 
+        w = tf.get_variable("w", [k_d, k_h, k_w, output_shape[-1], x.get_shape()[-1]],
                             initializer=tf.truncated_normal_initializer(stddev=stddev))
-        deconv = tf.nn.conv3d_transpose(x, w, outut_shape=output_shape,
+        deconv = tf.nn.conv3d_transpose(x, w, output_shape=output_shape,
                             strides=[1,d_d,d_h,d_w,1], padding=padding)
-        biases = tf.get_variable("biases", [output_shape[-1]], 
+        biases = tf.get_variable("biases", [output_shape[-1]],
                                 initializer=tf.constant_initializer(0.0))
-        deconv = tf.reshape(tf.nn.bias_add(deconv, biases), deconv.get_shape()) 
+        deconv = tf.reshape(tf.nn.bias_add(deconv, biases), deconv.get_shape())
 
         if with_w:
             return deconv, w, biases
         else:
-            return deconv 
+            return deconv
 
 """
 fully connected layer for projecting
@@ -150,9 +154,9 @@ def linear(x, output_size, name="linear",
     """
     with tf.variable_scope(name) as scope:
         shape = x.get_shape().as_list()
-        w = tf.get_variable("w", [shape[1], output_size], tf.float32, 
+        w = tf.get_variable("w", [shape[1], output_size], tf.float32,
                             initializer=tf.truncated_normal_initializer(stddev=stddev))
-        biases = tf.get_variable("biases", [output_size], 
+        biases = tf.get_variable("biases", [output_size],
                             initializer=tf.constant_initializer(bias_start))
         if sn:
             w = sepctral_norm(w)
@@ -166,12 +170,12 @@ def linear(x, output_size, name="linear",
 """
 Batch normlization
 """
-def batch_norm(x, is_training, momentum=0.9, epsilon=1e-5, name="batch_norm"):
-    return tf.contrib.layers.batch_norm(x, 
-                                        decay=momentum, 
-                                        center=True, 
+def batch_norm(x, is_training=False, momentum=0.9, epsilon=1e-5, name="batch_norm"):
+    return tf.contrib.layers.batch_norm(x,
+                                        decay=momentum,
+                                        center=True,
                                         scale=True,
-                                        epsilon=epsilon, 
+                                        epsilon=epsilon,
                                         is_training=is_training,
                                         scope=name)
 """
@@ -185,19 +189,19 @@ def layer_norm(x, is_training, name="layer_norm"):
                                         scope=name)
 
 """
-L2 norm 
+L2 norm
 """
 def l2_norm(v, eps=1e-12):
     return v / (tf.reduce_sum(v**2)**0.5 + eps)
 
 """
-sepctral normalization 
+sepctral normalization
 """
 def sepctral_norm(w, iteration=1):
     w_shape = w.shape.as_list()
     w = tf.shape(w, [-1, w_shape[-1]])
 
-    u = tf.get_variable("u", [1, w_shape[-1]], 
+    u = tf.get_variable("u", [1, w_shape[-1]],
                         initializer=tf.truncated_normal_initializer(),
                         trainable=False)
     u_hat = u
@@ -211,7 +215,7 @@ def sepctral_norm(w, iteration=1):
     w_norm = w / sigma
     with tf.control_dependencies([u.assign(u_hat)]):
         w_norm = tf.reshape(w_norm, w_shape)
-    
+
     return w_norm
 
 """
@@ -231,7 +235,7 @@ self attention layer
 """
 def attention_layer(x, name="attention", sn=False, with_att=False):
     """
-    input: 
+    input:
         x: [batch_size, H, W, C]
         sn: use spectral normalization or not
         with_att: True to return attention map and gamma
