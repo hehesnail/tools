@@ -15,7 +15,6 @@ def concat(tensors, axis, *args, **kwargs):
 
 """
 conv2d for downsampling
-Using He initialization
 """
 def conv2d(x, output_dim,
         k_h=4, k_w=4, d_h=2, d_w=2, stddev = 0.02,
@@ -47,7 +46,6 @@ def conv2d(x, output_dim,
 
 """
 conv3d for downsampling
-Using He initializetion
 """
 def conv3d(x, output_dim,
         k_d=4, k_h=4, k_w=4, d_d=2, d_h=2, d_w=2, stddev = 0.02,
@@ -76,7 +74,6 @@ def conv3d(x, output_dim,
 
 """
 deconv2d for upsampling
-Using He initialization
 """
 def deconv2d(x, output_shape,
             k_h=4, k_w=4, d_h=2, d_w=2, stddev=0.02,
@@ -110,7 +107,6 @@ def deconv2d(x, output_shape,
 
 """
 deconv3d for upsampling
-Using He initialization
 """
 def deconv3d(x, output_shape,
             k_d=4, k_h=4, k_w=4, d_d=2, d_h=2, d_w=2, stddev=0.02,
