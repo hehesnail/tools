@@ -1,2 +1,2 @@
 # tools
-Useful tools for writing GANs
+Useful tools for daily work.
